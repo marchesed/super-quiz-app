@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FlatList, Image, Text, View, StyleSheet, Dimensions } from "react-native";
 import { Styles } from "../GlobalStyles";
 import axios from "axios";
 import AnswerButton from "../components/AnswerButton";
+import Timer from "../components/Timer";
 
 const QUESTIONS_URL = 'https://scs-interview-api.herokuapp.com/questions';
 
@@ -26,76 +27,51 @@ export default function Quiz () {
 
     const [questions, setQuestions] = useState<Array<Question>>([]);
     const [questionNumber, setQuestionNumber] = useState<number>(0);
-    const [timeLeft, setTimeLeft] = useState<number>(0);
+    const [timeLeft, setTimeLeft] = useState<number>(10);
     const [buttonData, setButtonData] = useState<Array<ButtonData>>([]);
     const [buttonsDisabled, setButtonsDisabled] = useState(false);
-    const [answerSelected, setAnswerSelected] = useState<number>(420);
+    // const [answerSelected, setAnswerSelected] = useState<number>(420);
+    const answerRef = useRef(420);
 
-    const startTimer = (time: number, quizQuestions: Array<Question>) => {
-        setTimeLeft(time);
-        let timer = setInterval(() => {
-            setTimeLeft(timeLeft => timeLeft - 1);
-            if(timeLeft < 1) {
-                console.log('check answer', answerSelected)
-                // checkAnswer(answerSelected, quizQuestions);
-                clearInterval(timer);
-                // setTimeout(() => {
-                //     console.log('move to next Q',questionNumber)
-                //     if (questionNumber < questions.length - 1) {
-                //         // setButtonsDisabled(false);
-                //         // setQuestionNumber(questionNumber => questionNumber+1);
-                //         // generateButtonData(questions[questionNumber + 1].options)
-                //         // startTimer(Number(questions[questionNumber + 1].time), quizQuestions)
-                //     }
-                // },3000);
-            }
-        }, 1000);
-        
-        setTimeout(() => {
-            console.log('after interval is done')
-            console.log('check answer', answerSelected)
-        }, 10000)
+    const timerDone = () => {
+        console.log('timers done', answerRef.current, questions, questionNumber)
+        checkAnswer(answerRef.current);
     }
 
-    function checkAnswer (answerSelected: number, quizQuestions: Array<Question>) {
+    function checkAnswer (answerSelected: number) {
         // console.log('input',answerSelected);
         // console.log('answer',questions[questionNumber].answer);
-        if (answerSelected && quizQuestions && questionNumber) {
-            if (answerSelected === quizQuestions[questionNumber].answer) {
-                console.log('correct')
-                let newButtonData = [...buttonData];
-                newButtonData[answerSelected] = {...newButtonData[answerSelected], isSelected: false, isCorrect: true}
-                setButtonData(newButtonData)
-            }
-            else {
-                console.log('wrong')
-                let newButtonData = [...buttonData];
-                newButtonData[answerSelected] = {...newButtonData[answerSelected], isSelected: false, isWrong: true}
-                newButtonData[quizQuestions[questionNumber].answer] = {...newButtonData[quizQuestions[questionNumber].answer], isCorrect: true}
-                setButtonData(newButtonData)
-            }
+        if (answerSelected === questions[questionNumber].answer) {
+            console.log('correct')
+            let newButtonData = [...buttonData];
+            newButtonData[answerSelected] = {...newButtonData[answerSelected], isSelected: false, isCorrect: true}
+            setButtonData(newButtonData)
         }
-        
+        else {
+            console.log('wrong')
+            let newButtonData = [...buttonData];
+            newButtonData[answerSelected] = {...newButtonData[answerSelected], isSelected: false, isWrong: true}
+            newButtonData[questions[questionNumber].answer] = {...newButtonData[questions[questionNumber].answer], isCorrect: true}
+            setButtonData(newButtonData)
+        }
     }
 
     useEffect(() => {
         (async () => {
           const questionsResponse = await axios.get<Array<Question>>(QUESTIONS_URL);
-          console.log('time init', Number(questionsResponse.data[0].time));
           setQuestions(questionsResponse.data);
           generateButtonData(questionsResponse.data[0].options);
-          startTimer(Number(questionsResponse.data[0].time), questionsResponse.data);
+          // setTimeLeft(Number(questionsResponse.data[0].time));
+          // startTimer()
+          // startTimer(Number(questionsResponse.data[0].time), questionsResponse.data);
           setButtonsDisabled(false);
         })()
     }, []);
-
-    useEffect(() => {
-        console.log('question updated')
-    }, [questionNumber])
     
     const optionPress = (index: number) => {
         console.log('option selected',index)
-        setAnswerSelected(index);
+        answerRef.current = index;
+        //setAnswerSelected(index);
         let newButtonData = [...buttonData];
         newButtonData[index] = {...newButtonData[index], isSelected: true}
         setButtonData(newButtonData)
@@ -125,7 +101,10 @@ export default function Quiz () {
     if (questions.length > 0) {
         return(
             <View style={Styles.container}>
-                <Text>{timeLeft}</Text>
+                <Timer 
+                    time={10}
+                    onComplete={() => timerDone()}
+                />
                 <Image
                     style={quizStyles.questionImage} 
                     source={{ uri: questions[questionNumber].imageUrl }} 
