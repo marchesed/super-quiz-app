@@ -18,7 +18,7 @@ export default function Summary({route, navigation}: Props) {
 
     return (
         <View style={Styles.container}>
-            <Text style={Styles.header}>Quiz Complete!</Text>
+            <Text style={Styles.header}>Quiz Complete</Text>
             <Text style={Styles.text}>You got {numCorrect} out of {numOfQuestions} correct!</Text>
             {numCorrect === numOfQuestions &&
                 <Text style={Styles.text}>That's a perfect score, great job!! 💯</Text>

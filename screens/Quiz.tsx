@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FlatList, Image, Text, View, StyleSheet, Dimensions, Alert } from "react-native";
+import { FlatList, Image, Text, View, StyleSheet, Alert, SafeAreaView } from "react-native";
 import { Colors, Styles } from "../GlobalStyles";
 import axios from "axios";
 import AnswerButton from "../components/AnswerButton";
@@ -131,7 +131,7 @@ export default function Quiz ({navigation}: Props) {
 
     if (questions.length > 0) {
         return(
-            <View style={Styles.container}>
+            <SafeAreaView style={Styles.container}>
                 <Timer 
                     time={Number(questions[questionNumber].time)}
                     questionNumber={questionNumber}
@@ -145,7 +145,7 @@ export default function Quiz ({navigation}: Props) {
                 <Text style={[Styles.text, quizStyles.question]}>{questions[questionNumber].question}</Text>
                 <FlatList 
                     data = {questions[questionNumber].options}
-                    style={{flexGrow: 0.5}}
+                    style={{flexGrow: 0.6}}
                     renderItem = {({item, index}) => 
                         <AnswerButton 
                             buttonText={item} 
@@ -156,9 +156,10 @@ export default function Quiz ({navigation}: Props) {
                     }
                     keyExtractor={(item) => item}
                     scrollEnabled={false}
+                    showsVerticalScrollIndicator={false}
                 />
                 <Toast ref={(ref) => Toast.setRef(ref)}/>
-            </View>
+            </SafeAreaView>
         )
     }
     return (

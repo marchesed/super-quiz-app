@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions, Easing } from 'react-native';
+import { Text, StyleSheet, Animated, Dimensions, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Styles } from '../GlobalStyles';
 
@@ -17,8 +17,9 @@ const Timer: FC<Props> = (props) => {
 
     const barColor =  barColorValue.current.interpolate({
         inputRange: [0, 1],
-        outputRange:["lime" , "red"]
-      })
+        outputRange:[Colors.brightGreen, Colors.brightRed]
+    })
+
     useEffect(() => {
         let counter = props.time;
         Animated.parallel([
@@ -72,18 +73,19 @@ const Timer: FC<Props> = (props) => {
 
 const timerStyles = StyleSheet.create({
     timeBar: {
-        backgroundColor: 'lime',
+        backgroundColor: Colors.brightGreen,
         height: 20,
         left: 0,
-        top: 10,
+        top: Platform.OS === 'ios' ? 10 : 0,
         position: 'absolute'
     },
     container: {
         position: 'absolute',
-        top: 30,
+        top: Platform.OS === 'ios' ? 30 : 10,
         left: 10
     },
     text: {
+        top: Platform.OS === 'ios' ? 0 : 20,
         left: width/2 - 10,
         textAlign: 'center'
     }

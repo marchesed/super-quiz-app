@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, SafeAreaView } from 'react-native';
 import { Styles } from './GlobalStyles';
 import { useFonts } from 'expo-font';
 import Button from './components/Button';
@@ -32,7 +32,7 @@ function Home({navigation}: any) {
   }
 
   return (
-    <View style={Styles.container}>
+    <SafeAreaView style={Styles.container}>
       <Text style={Styles.text}>Welcome to</Text>
       <Text style={Styles.header}>SuperQuizApp!</Text>
       <Button 
@@ -41,7 +41,7 @@ function Home({navigation}: any) {
       />
       <Text style={Styles.subtext}>Click the start quiz button above to start the quiz!</Text>
       <StatusBar style="auto" />
-    </View>
+    </SafeAreaView>
   );
 }
 

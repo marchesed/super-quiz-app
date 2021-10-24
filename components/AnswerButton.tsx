@@ -47,10 +47,10 @@ const buttonStyles = StyleSheet.create({
         backgroundColor: Colors.yellow,
     },
     buttonCorrect: {
-        backgroundColor: 'lime'
+        backgroundColor: Colors.brightGreen
     },
     buttonWrong: {
-        backgroundColor: 'red'
+        backgroundColor: Colors.brightRed
     },
     buttonText: {
         color: 'white'

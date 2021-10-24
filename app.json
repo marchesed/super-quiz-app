@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "super-quiz-app",
+    "name": "Super Quiz App",
     "slug": "super-quiz-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "updates": {
