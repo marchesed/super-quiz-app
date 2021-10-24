@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FlatList, Image, Text, View, StyleSheet, Dimensions } from "react-native";
+import { FlatList, Image, Text, View, StyleSheet, Dimensions, Alert } from "react-native";
 import { Styles } from "../GlobalStyles";
 import axios from "axios";
 import AnswerButton from "../components/AnswerButton";
 import Timer from "../components/Timer";
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 const QUESTIONS_URL = 'https://scs-interview-api.herokuapp.com/questions';
 
@@ -23,66 +24,89 @@ interface ButtonData {
 
 const width = Dimensions.get('screen').width;
 
-export default function Quiz () {
+type RootStackParamList = {
+    Home: undefined;
+    Quiz: undefined;
+    Summary: {numOfQuestions: number, numCorrect: number};
+  };
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Quiz'>;
+
+export default function Quiz ({navigation}: Props) {
 
     const [questions, setQuestions] = useState<Array<Question>>([]);
+    const [numCorrect, setNumCorrect] = useState<number>(0);
     const [questionNumber, setQuestionNumber] = useState<number>(0);
-    const [timeLeft, setTimeLeft] = useState<number>(10);
     const [buttonData, setButtonData] = useState<Array<ButtonData>>([]);
     const [buttonsDisabled, setButtonsDisabled] = useState(false);
-    // const [answerSelected, setAnswerSelected] = useState<number>(420);
-    const answerRef = useRef(420);
+    const answerRef = useRef(9001);
 
     const timerDone = () => {
-        console.log('timers done', answerRef.current, questions, questionNumber)
+        console.log('but data', buttonData)
         checkAnswer(answerRef.current);
     }
 
-    function checkAnswer (answerSelected: number) {
-        // console.log('input',answerSelected);
-        // console.log('answer',questions[questionNumber].answer);
+    const checkAnswer = async (answerSelected: number) => {
+        console.log('option selected', answerSelected, questions[questionNumber].answer)
         if (answerSelected === questions[questionNumber].answer) {
-            console.log('correct')
+            setNumCorrect(num => num+1)
             let newButtonData = [...buttonData];
             newButtonData[answerSelected] = {...newButtonData[answerSelected], isSelected: false, isCorrect: true}
+            console.log('correct',newButtonData, buttonData)
             setButtonData(newButtonData)
         }
         else {
-            console.log('wrong')
             let newButtonData = [...buttonData];
             newButtonData[answerSelected] = {...newButtonData[answerSelected], isSelected: false, isWrong: true}
             newButtonData[questions[questionNumber].answer] = {...newButtonData[questions[questionNumber].answer], isCorrect: true}
+            console.log('wrong',newButtonData, buttonData)
             setButtonData(newButtonData)
         }
+        setTimeout(async() => {
+            console.log('should nav?',questionNumber,questions.length - 1)
+            if (questionNumber === questions.length - 1){
+                navigation.navigate('Summary', { numOfQuestions: questions.length, numCorrect: numCorrect });
+                return;
+            } else {
+                setButtonsDisabled(false);
+                generateButtonData(questions[questionNumber+1].options);
+                await setQuestionNumber(num => num+1);
+                answerRef.current = 9001;
+            }
+        }, 3000)
     }
 
     useEffect(() => {
         (async () => {
-          const questionsResponse = await axios.get<Array<Question>>(QUESTIONS_URL);
-          setQuestions(questionsResponse.data);
-          generateButtonData(questionsResponse.data[0].options);
-          // setTimeLeft(Number(questionsResponse.data[0].time));
-          // startTimer()
-          // startTimer(Number(questionsResponse.data[0].time), questionsResponse.data);
-          setButtonsDisabled(false);
+            try {
+                const questionsResponse = await axios.get<Array<Question>>(QUESTIONS_URL);
+                await setQuestions(questionsResponse.data);
+                await setQuestionNumber(0);
+                await generateButtonData(questionsResponse.data[0].options);
+                await setButtonsDisabled(false);
+            }
+            catch {
+                Alert.alert('An error has occurred during retrieval of the quiz questions :(', 
+                'Please try again later',
+                [{
+                    text: 'Okay',
+                    onPress: () => navigation.navigate('Home') 
+                }])
+                
+            }
+            
+            
         })()
     }, []);
     
     const optionPress = (index: number) => {
         console.log('option selected',index)
         answerRef.current = index;
-        //setAnswerSelected(index);
         let newButtonData = [...buttonData];
         newButtonData[index] = {...newButtonData[index], isSelected: true}
         setButtonData(newButtonData)
         setButtonsDisabled(true);
-        // if (questionNumber < questions.length - 1) {
-        //     setQuestionNumber(questionNumber+1);
-        //     generateButtonData(questions[questionNumber + 1].options)
-        //     startTimer(Number(questions[questionNumber + 1].time))
-        //     return;
-        // }
-        // return;
+        return;
     }
 
     const generateButtonData = (options: Array<string>) => {
@@ -102,14 +126,15 @@ export default function Quiz () {
         return(
             <View style={Styles.container}>
                 <Timer 
-                    time={10}
+                    time={Number(questions[questionNumber].time)}
+                    questionNumber={questionNumber}
                     onComplete={() => timerDone()}
                 />
                 <Image
                     style={quizStyles.questionImage} 
                     source={{ uri: questions[questionNumber].imageUrl }} 
                     resizeMode={'cover'}
-                    />
+                />
                 <Text style={Styles.text}>{questions[questionNumber].question}</Text>
                 <FlatList 
                     data = {questions[questionNumber].options}

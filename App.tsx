@@ -7,6 +7,7 @@ import Button from './components/Button';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Quiz from './screens/Quiz';
+import Summary from './screens/Summary';
 
 function Home({navigation}: any) {
   let [fontsLoaded] = useFonts({
@@ -51,6 +52,7 @@ export default function App() {
       <Stack.Navigator>
         <Stack.Screen name="Home" component={Home} options={{headerShown: false}} />
         <Stack.Screen name="Quiz" component={Quiz} options={{headerShown: false}} />
+        <Stack.Screen name="Summary" component={Summary} options={{headerShown: false}} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { TouchableHighlight, Text, StyleSheet } from 'react-native';
+import { TouchableHighlight, Text, StyleSheet, Alert } from 'react-native';
 import { Colors, Styles } from '../GlobalStyles';
 
 interface Props {
@@ -16,15 +16,18 @@ interface ButtonData {
 }
 
 const AnswerButton: FC<Props> = (props) => {
+    const disablePress = () => {
+        Alert.alert("You've already submitted an answer to this question!")
+    }
     return (
         <TouchableHighlight 
             style={[buttonStyles.button, 
                 props?.buttonData?.isSelected ? buttonStyles.buttonSelected : {},
                 props?.buttonData?.isCorrect ? buttonStyles.buttonCorrect : {},
                 props?.buttonData?.isWrong ? buttonStyles.buttonWrong : {}]} 
-            onPress={() => props.buttonPress()}
+            onPress={props.isDisabled ? () => disablePress() : () => props.buttonPress()}
             underlayColor={Colors.yellow}
-            disabled={props.isDisabled}>
+        >
             <Text style={[Styles.text, buttonStyles.buttonText]}>{props.buttonText}</Text>
         </TouchableHighlight>
     )
