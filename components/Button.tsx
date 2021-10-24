@@ -22,6 +22,7 @@ const buttonStyles = StyleSheet.create({
     button: {
         paddingHorizontal: 20,
         paddingVertical: 10,
+        marginVertical: 10,
         backgroundColor: Colors.pink,
         borderRadius: 10,
         alignItems: 'center',

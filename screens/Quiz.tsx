@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FlatList, Image, Text, View, StyleSheet, Dimensions, Alert } from "react-native";
-import { Styles } from "../GlobalStyles";
+import { Colors, Styles } from "../GlobalStyles";
 import axios from "axios";
 import AnswerButton from "../components/AnswerButton";
 import Timer from "../components/Timer";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import Toast from 'react-native-toast-message';
 
 const QUESTIONS_URL = 'https://scs-interview-api.herokuapp.com/questions';
+const TOAST_VISIBILITY = 2000;
 
 interface Question {
     imageUrl: string;
@@ -22,8 +24,6 @@ interface ButtonData {
     isWrong: boolean;
 }
 
-const width = Dimensions.get('screen').width;
-
 type RootStackParamList = {
     Home: undefined;
     Quiz: undefined;
@@ -35,37 +35,47 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Quiz'>;
 export default function Quiz ({navigation}: Props) {
 
     const [questions, setQuestions] = useState<Array<Question>>([]);
-    const [numCorrect, setNumCorrect] = useState<number>(0);
+    // const [numCorrect, setNumCorrect] = useState<number>(0);
     const [questionNumber, setQuestionNumber] = useState<number>(0);
     const [buttonData, setButtonData] = useState<Array<ButtonData>>([]);
     const [buttonsDisabled, setButtonsDisabled] = useState(false);
     const answerRef = useRef(9001);
+    const numCorrectRef = useRef(0);
 
     const timerDone = () => {
-        console.log('but data', buttonData)
         checkAnswer(answerRef.current);
     }
 
     const checkAnswer = async (answerSelected: number) => {
-        console.log('option selected', answerSelected, questions[questionNumber].answer)
         if (answerSelected === questions[questionNumber].answer) {
-            setNumCorrect(num => num+1)
+            Toast.show({
+                type: 'success',
+                text1: 'Correct!!',
+                text2: 'Nice one 👏',
+                visibilityTime: TOAST_VISIBILITY,
+                position: 'bottom'
+            });
+            numCorrectRef.current = numCorrectRef.current + 1
             let newButtonData = [...buttonData];
             newButtonData[answerSelected] = {...newButtonData[answerSelected], isSelected: false, isCorrect: true}
-            console.log('correct',newButtonData, buttonData)
             setButtonData(newButtonData)
         }
         else {
+            Toast.show({
+                type: 'error',
+                text1: 'Incorrect',
+                text2: 'Close!!',
+                visibilityTime: TOAST_VISIBILITY,
+                position: 'bottom'
+            });
             let newButtonData = [...buttonData];
             newButtonData[answerSelected] = {...newButtonData[answerSelected], isSelected: false, isWrong: true}
             newButtonData[questions[questionNumber].answer] = {...newButtonData[questions[questionNumber].answer], isCorrect: true}
-            console.log('wrong',newButtonData, buttonData)
             setButtonData(newButtonData)
         }
         setTimeout(async() => {
-            console.log('should nav?',questionNumber,questions.length - 1)
             if (questionNumber === questions.length - 1){
-                navigation.navigate('Summary', { numOfQuestions: questions.length, numCorrect: numCorrect });
+                navigation.navigate('Summary', { numOfQuestions: questions.length, numCorrect: numCorrectRef?.current });
                 return;
             } else {
                 setButtonsDisabled(false);
@@ -84,23 +94,20 @@ export default function Quiz ({navigation}: Props) {
                 await setQuestionNumber(0);
                 await generateButtonData(questionsResponse.data[0].options);
                 await setButtonsDisabled(false);
+                numCorrectRef.current = 0;
             }
             catch {
                 Alert.alert('An error has occurred during retrieval of the quiz questions :(', 
                 'Please try again later',
                 [{
                     text: 'Okay',
-                    onPress: () => navigation.navigate('Home') 
+                    onPress: () => navigation.navigate('Home')
                 }])
-                
             }
-            
-            
-        })()
+        })();
     }, []);
     
     const optionPress = (index: number) => {
-        console.log('option selected',index)
         answerRef.current = index;
         let newButtonData = [...buttonData];
         newButtonData[index] = {...newButtonData[index], isSelected: true}
@@ -135,7 +142,7 @@ export default function Quiz ({navigation}: Props) {
                     source={{ uri: questions[questionNumber].imageUrl }} 
                     resizeMode={'cover'}
                 />
-                <Text style={Styles.text}>{questions[questionNumber].question}</Text>
+                <Text style={[Styles.text, quizStyles.question]}>{questions[questionNumber].question}</Text>
                 <FlatList 
                     data = {questions[questionNumber].options}
                     style={{flexGrow: 0.5}}
@@ -150,6 +157,7 @@ export default function Quiz ({navigation}: Props) {
                     keyExtractor={(item) => item}
                     scrollEnabled={false}
                 />
+                <Toast ref={(ref) => Toast.setRef(ref)}/>
             </View>
         )
     }
@@ -163,6 +171,14 @@ export default function Quiz ({navigation}: Props) {
 const quizStyles = StyleSheet.create({
     questionImage: {
         height: 200,
-        width: 300
+        width: 300,
+        margin: 10,
+        borderRadius: 5,
+        borderWidth: 5,
+        borderColor: Colors.pink
+    },
+    question: {
+        margin: 10,
+        textAlign: 'center'
     }
 })

@@ -84,7 +84,8 @@ const timerStyles = StyleSheet.create({
         left: 10
     },
     text: {
-        left: width/2
+        left: width/2 - 10,
+        textAlign: 'center'
     }
 })
 

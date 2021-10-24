@@ -15,13 +15,13 @@ function Home({navigation}: any) {
   });
 
   const startQuiz = () => {
-    console.log('starting quiz')
     navigation.navigate('Quiz')
     navigation.reset({
       index: 0,
       routes: [{name: 'Quiz'}]
     })
   }
+
   if (!fontsLoaded) {
     return (
       <View style={Styles.container}>
@@ -30,15 +30,16 @@ function Home({navigation}: any) {
       </View>
     );
   }
+
   return (
     <View style={Styles.container}>
       <Text style={Styles.text}>Welcome to</Text>
       <Text style={Styles.header}>SuperQuizApp!</Text>
-      <Text style={Styles.subtext}>Click the start quiz button below to start the quiz!</Text>
       <Button 
         buttonText={'START QUIZ'} 
         buttonPress={() => startQuiz()}
       />
+      <Text style={Styles.subtext}>Click the start quiz button above to start the quiz!</Text>
       <StatusBar style="auto" />
     </View>
   );
@@ -57,4 +58,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
