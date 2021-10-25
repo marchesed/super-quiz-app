@@ -25,7 +25,8 @@ const AnswerButton: FC<Props> = (props) => {
                 props?.buttonData?.isSelected ? buttonStyles.buttonSelected : {},
                 props?.buttonData?.isCorrect ? buttonStyles.buttonCorrect : {},
                 props?.buttonData?.isWrong ? buttonStyles.buttonWrong : {}]} 
-            onPress={props.isDisabled ? () => disablePress() : () => props.buttonPress()}
+            onPress={() => props.buttonPress()}
+            disabled={props.isDisabled}
             underlayColor={Colors.yellow}
         >
             <Text style={[Styles.text, buttonStyles.buttonText]}>{props.buttonText}</Text>
@@ -44,7 +45,7 @@ const buttonStyles = StyleSheet.create({
         marginVertical: 5
     },
     buttonSelected: {
-        backgroundColor: Colors.yellow,
+        backgroundColor: Colors.yellow
     },
     buttonCorrect: {
         backgroundColor: Colors.brightGreen
@@ -53,7 +54,7 @@ const buttonStyles = StyleSheet.create({
         backgroundColor: Colors.brightRed
     },
     buttonText: {
-        color: 'white'
+        color: Colors.white
     }
 })
 

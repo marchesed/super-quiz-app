@@ -27,7 +27,7 @@ interface ButtonData {
 type RootStackParamList = {
     Home: undefined;
     Quiz: undefined;
-    Summary: {numOfQuestions: number, numCorrect: number};
+    Summary: { numOfQuestions: number, numCorrect: number };
   };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Quiz'>;
@@ -35,7 +35,6 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Quiz'>;
 export default function Quiz ({navigation}: Props) {
 
     const [questions, setQuestions] = useState<Array<Question>>([]);
-    // const [numCorrect, setNumCorrect] = useState<number>(0);
     const [questionNumber, setQuestionNumber] = useState<number>(0);
     const [buttonData, setButtonData] = useState<Array<ButtonData>>([]);
     const [buttonsDisabled, setButtonsDisabled] = useState(false);
@@ -55,23 +54,25 @@ export default function Quiz ({navigation}: Props) {
                 visibilityTime: TOAST_VISIBILITY,
                 position: 'bottom'
             });
-            numCorrectRef.current = numCorrectRef.current + 1
+            numCorrectRef.current = numCorrectRef.current + 1;
             let newButtonData = [...buttonData];
-            newButtonData[answerSelected] = {...newButtonData[answerSelected], isSelected: false, isCorrect: true}
-            setButtonData(newButtonData)
+            newButtonData[answerSelected] = {...newButtonData[answerSelected], isSelected: false, isCorrect: true};
+            setButtonData(newButtonData);
         }
         else {
+            let incorrectHeader = answerSelected === 9001 ? 'No Answer Selected' : 'Incorrect';
+            let incorrectSubtext = answerSelected === 9001 ? 'Be sure to submit an answer within the given time limit!' : 'Close!!';
             Toast.show({
                 type: 'error',
-                text1: 'Incorrect',
-                text2: 'Close!!',
+                text1: incorrectHeader,
+                text2: incorrectSubtext,
                 visibilityTime: TOAST_VISIBILITY,
                 position: 'bottom'
             });
             let newButtonData = [...buttonData];
-            newButtonData[answerSelected] = {...newButtonData[answerSelected], isSelected: false, isWrong: true}
-            newButtonData[questions[questionNumber].answer] = {...newButtonData[questions[questionNumber].answer], isCorrect: true}
-            setButtonData(newButtonData)
+            newButtonData[answerSelected] = {...newButtonData[answerSelected], isSelected: false, isWrong: true};
+            newButtonData[questions[questionNumber].answer] = {...newButtonData[questions[questionNumber].answer], isCorrect: true};
+            setButtonData(newButtonData);
         }
         setTimeout(async() => {
             if (questionNumber === questions.length - 1){
@@ -110,8 +111,8 @@ export default function Quiz ({navigation}: Props) {
     const optionPress = (index: number) => {
         answerRef.current = index;
         let newButtonData = [...buttonData];
-        newButtonData[index] = {...newButtonData[index], isSelected: true}
-        setButtonData(newButtonData)
+        newButtonData[index] = {...newButtonData[index], isSelected: true};
+        setButtonData(newButtonData);
         setButtonsDisabled(true);
         return;
     }
@@ -121,10 +122,10 @@ export default function Quiz ({navigation}: Props) {
             isCorrect: false,
             isSelected: false,
             isWrong: false
-        }
+        };
         let buttonDataArray = []
         for(let i = 0; i < options.length; i++) {
-            buttonDataArray.push(defaultObj)
+            buttonDataArray.push(defaultObj);
         }
         setButtonData(buttonDataArray);
     }

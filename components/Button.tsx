@@ -12,7 +12,8 @@ const Button: FC<Props> = (props) => {
         <TouchableHighlight 
             style={buttonStyles.button} 
             onPress={() => props.buttonPress()}
-            underlayColor={Colors.yellow}>
+            underlayColor={Colors.yellow}
+        >
             <Text style={[Styles.text, buttonStyles.buttonText]}>{props.buttonText}</Text>
         </TouchableHighlight>
     )
@@ -29,7 +30,7 @@ const buttonStyles = StyleSheet.create({
         justifyContent: 'center'
     },
     buttonText: {
-        color: 'white'
+        color: Colors.white
     }
 })
 

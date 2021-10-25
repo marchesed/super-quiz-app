@@ -14,7 +14,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Summary'>;
 
 export default function Summary({route, navigation}: Props) {
 
-    const {numOfQuestions, numCorrect} = route.params;
+    const { numOfQuestions, numCorrect } = route.params;
 
     return (
         <View style={Styles.container}>

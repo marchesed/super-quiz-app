@@ -7,7 +7,8 @@ export var Colors = {
     blue: '#118AB2',
     darkBlue: '#073B4C',
     brightGreen: 'lime',
-    brightRed: 'red'
+    brightRed: 'red',
+    white: 'white'
 }
 
 export var Styles = StyleSheet.create({

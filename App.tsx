@@ -15,11 +15,11 @@ function Home({navigation}: any) {
   });
 
   const startQuiz = () => {
-    navigation.navigate('Quiz')
+    navigation.navigate('Quiz');
     navigation.reset({
       index: 0,
       routes: [{name: 'Quiz'}]
-    })
+    });
   }
 
   if (!fontsLoaded) {
